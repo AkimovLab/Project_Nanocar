@@ -1,0 +1,3 @@
+Activation Energy of pivoting motion at low temperatures    
+    NC/SLG : Ea(meV)   NT/SLG : Ea(meV)     NC/FLG : Ea(meV)   NT/FLG : Ea(meV)
+    6.81646698         10.01616698          6.26464561         11.76742343 
