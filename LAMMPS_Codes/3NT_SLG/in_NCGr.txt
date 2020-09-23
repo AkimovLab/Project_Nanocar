@@ -1,0 +1,184 @@
+#God
+#NC on Graphene
+
+package         gpu 1 neigh no newton off
+suffix          gpu
+
+dimension		3
+boundary		p p p
+units			metal
+atom_style		full                             #molecular
+
+bond_style      harmonic
+angle_style     harmonic
+dihedral_style  opls                             #harmonic
+
+read_data       Ntruck.data
+read_data		G12.data add append              #offset 3 4 4 8 shift -30 -24 -6
+
+group	   	    nanocar         type 1 2 3 4
+group           Graphene		type 5
+group           wheel1          id 2:61
+group           wheel2          id 65:124
+group           wheel3          id 182:241
+group           wheel4          id 244:303
+group           chassis         id 1 62:64 125:181 242 243 304
+group           spring          id 3186
+group           p1              id 135
+group           p2              id 155
+
+#######################################
+pair_style      hybrid tersoff lj/cut 12
+special_bonds	charmm
+## pair_modify	mix arithmetic
+
+pair_coeff      * * tersoff SiC.tersoff NULL NULL NULL NULL C
+pair_coeff      1 1 lj/cut  0.001499    2.650 	  #  H  H   
+pair_coeff      1 2 lj/cut  0.001337    2.810     #  H  C2          
+pair_coeff      1 3 lj/cut  0.001337    2.810     #  H  CA          
+pair_coeff      1 5 lj/cut  0.001337    2.810     #  H  Graphene    
+pair_coeff      2 2 lj/cut  0.002410    3.400     #  C2 C2          
+pair_coeff      2 3 lj/cut  0.002410    3.400     #  C2 CA          
+pair_coeff      2 5 lj/cut  0.002410    3.400 	  #  C2 Graphene 
+pair_coeff      3 3 lj/cut  0.002410    3.400     #  CA CA 
+pair_coeff      3 5 lj/cut  0.002410    3.400     #  CA Graphene 
+
+pair_coeff      1 4 lj/cut  0.001973    3.033     #  H  N
+pair_coeff      2 4 lj/cut  0.002501    3.408 	  #  C2 N 
+pair_coeff      3 4 lj/cut  0.002501    3.408     #  CA N
+pair_coeff      4 4 lj/cut  0.002597    3.416     #  N  N
+pair_coeff      4 5 lj/cut  0.002501    3.408     #  N  Graphene  
+
+#######################################
+velocity	    nanocar     create $T 968399 mom yes rot yes dist gaussian
+velocity		Graphene 	create $T 351648 mom yes rot yes dist gaussian
+#velocity       rigid_base  set    0    0     0   units box
+#######################################
+compute 		peratom 	nanocar    pe/atom
+compute			pe_nc 		nanocar    reduce sum c_peratom  	#calculates a per-atom vector
+compute         lennard     nanocar    group/group Graphene
+compute    	    temp_nc     nanocar    temp/com
+compute 	    ke_nc       nanocar    ke
+compute         msdd        nanocar    msd
+compute         temp_sub    Graphene   temp/com
+compute 		peratom_sub Graphene   pe/atom
+compute			pe_sub		Graphene   reduce sum c_peratom_sub 
+compute 	    ke_sub      Graphene   ke
+
+variable        xcm_x equal xcm(nanocar,x)
+variable        xcm_y equal xcm(nanocar,y)
+variable        xcm_z equal xcm(nanocar,z)
+  
+variable        vcm_x equal vcm(nanocar,x)
+variable        vcm_y equal vcm(nanocar,y)
+variable        vcm_z equal vcm(nanocar,z)
+
+variable        wcm_x equal omega(nanocar,x)
+variable        wcm_y equal omega(nanocar,y)
+variable        wcm_z equal omega(nanocar,z)
+
+variable        fcm_x equal fcm(nanocar,x)
+variable        fcm_y equal fcm(nanocar,y)
+variable        fcm_z equal fcm(nanocar,z)
+
+variable		xsub_x equal xcm(Graphene,x)
+variable		xsub_y equal xcm(Graphene,y)
+variable		xsub_z equal xcm(Graphene,z)
+variable		vsub_x equal vcm(Graphene,x)
+variable		vsub_y equal vcm(Graphene,y)
+variable		vsub_z equal vcm(Graphene,z)
+
+variable		x1_x equal xcm(p1,x)
+variable		x1_y equal xcm(p1,y)
+variable		x1_z equal xcm(p1,z)
+variable		x2_x equal xcm(p2,x)
+variable		x2_y equal xcm(p2,y)
+variable		x2_z equal xcm(p2,z)
+
+variable		chassi_x	equal	xcm(chassis,x)		# Center of mass of chassis
+variable		chassi_y	equal	xcm(chassis,y)
+variable		chassi_z	equal	xcm(chassis,z)
+variable		chassi_vx	equal	vcm(chassis,x)		# Velocity of center of mass of chassis
+variable		chassi_vy	equal	vcm(chassis,y)
+variable		chassi_vz	equal	vcm(chassis,z)
+variable		chassi_ox	equal	omega(chassis,x)	# Angular velocity of chassis
+variable		chassi_oy	equal	omega(chassis,y)
+variable		chassi_oz	equal	omega(chassis,z)
+variable		wheel1_x	equal	xcm(wheel1,x)		# Center of mass of wheel1
+variable		wheel1_y	equal	xcm(wheel1,y)
+variable		wheel1_z	equal	xcm(wheel1,z)
+variable		wheel1_vx	equal	vcm(wheel1,x)		# Velocity of center of mass of wheel1
+variable		wheel1_vy	equal	vcm(wheel1,y)
+variable		wheel1_vz	equal	vcm(wheel1,z)
+variable		wheel1_ox	equal	omega(wheel1,x)		# Angular velocity of wheel1
+variable		wheel1_oy	equal	omega(wheel1,y)
+variable		wheel1_oz	equal	omega(wheel1,z)
+variable		wheel2_x	equal	xcm(wheel2,x)		# Center of mass of wheel2
+variable		wheel2_y	equal	xcm(wheel2,y)
+variable		wheel2_z	equal	xcm(wheel2,z)
+variable		wheel2_vx	equal	vcm(wheel2,x)		# Velocity of center of mass of wheel2
+variable		wheel2_vy	equal	vcm(wheel2,y)
+variable		wheel2_vz	equal	vcm(wheel2,z)
+variable		wheel2_ox	equal	omega(wheel2,x)		# Angular velocity of wheel2
+variable		wheel2_oy	equal	omega(wheel2,y)
+variable		wheel2_oz	equal	omega(wheel2,z)
+variable		wheel3_x	equal	xcm(wheel3,x)		# Center of mass of wheel3
+variable		wheel3_y	equal	xcm(wheel3,y)
+variable		wheel3_z	equal	xcm(wheel3,z)
+variable		wheel3_vx	equal	vcm(wheel3,x)		# Velocity of center of mass of wheel3
+variable		wheel3_vy	equal	vcm(wheel3,y)
+variable		wheel3_vz	equal	vcm(wheel3,z)
+variable		wheel3_ox	equal	omega(wheel3,x)		# Angular velocity of wheel3
+variable		wheel3_oy	equal	omega(wheel3,y)
+variable		wheel3_oz	equal	omega(wheel3,z)
+variable		wheel4_x	equal	xcm(wheel4,x)		# Center of mass of wheel4
+variable		wheel4_y	equal	xcm(wheel4,y)
+variable		wheel4_z	equal	xcm(wheel4,z)
+variable		wheel4_vx	equal	vcm(wheel4,x)		# Velocity of center of mass of wheel4
+variable		wheel4_vy	equal	vcm(wheel4,y)
+variable		wheel4_vz	equal	vcm(wheel4,z)
+variable		wheel4_ox	equal	omega(wheel4,x)		# Angular velocity of wheel4
+variable		wheel4_oy	equal	omega(wheel4,y)
+variable		wheel4_oz	equal	omega(wheel4,z)
+
+#######################################
+timestep	    0.001       # 1 fs
+thermo		    200     
+thermo_style 	custom      step pe lx ly lz press pxx pyy pzz c_pe_sub
+
+fix 			min Graphene  box/relax iso 0.0 vmax 0.001
+min_style 		cg 
+minimize 		1e-100 1e-100 10000 10000
+unfix           min
+
+dump			1 all       custom 40000 dump.NC_T$T.lammpstrj id type x y z       #xhi xlo yhi ylo
+dump_modify     1 element   H C C N C 
+dump_modify		1 first     yes
+
+#######################################
+reset_timestep 	0  
+thermo_style custom     step ke pe temp press c_ke_nc c_lennard c_pe_nc &
+                        v_xcm_x v_xcm_y v_xcm_z v_vcm_x v_vcm_y v_vcm_z &
+                        v_wcm_x v_wcm_y v_wcm_z v_fcm_x v_fcm_y v_fcm_z &
+                        c_msdd[1] c_msdd[2] c_msdd[3] v_x1_x v_x1_y v_x1_z v_x2_x v_x2_y v_x2_z &
+                        v_wheel1_x v_wheel1_y v_wheel1_z v_wheel1_vx v_wheel1_vy v_wheel1_vz v_wheel1_ox v_wheel1_oy v_wheel1_oz &
+                        v_wheel2_x v_wheel2_y v_wheel2_z v_wheel2_vx v_wheel2_vy v_wheel2_vz v_wheel2_ox v_wheel2_oy v_wheel2_oz &
+                        v_wheel3_x v_wheel3_y v_wheel3_z v_wheel3_vx v_wheel3_vy v_wheel3_vz v_wheel3_ox v_wheel3_oy v_wheel3_oz &
+                        v_wheel4_x v_wheel4_y v_wheel4_z v_wheel4_vx v_wheel4_vy v_wheel4_vz v_wheel4_ox v_wheel4_oy v_wheel4_oz &
+                        v_chassi_x v_chassi_y v_chassi_z v_chassi_vx v_chassi_vy v_chassi_vz v_chassi_ox v_chassi_oy v_chassi_oz &
+                        c_temp_nc c_temp_sub
+
+
+fix             1 nanocar   nvt temp      $T   $T   0.10  ## 0.005
+fix		        2 Graphene  nvt temp      $T   $T   0.10
+fix_modify 		1 			temp          temp_nc
+fix_modify 		2 			temp          temp_sub
+fix 			3 spring	spring/self   0.5 xyz
+#fix		    4 rigid     setforce      0    0    0 
+
+#write_restart restart.equ_T$T
+
+run		        40000000  
+
+
+
