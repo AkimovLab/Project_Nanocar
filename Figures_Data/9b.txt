@@ -1,0 +1,3 @@
+Activation Energy of Wheel's rotation at high temperatures    
+    NC/SLG : Ea(meV)   NT/SLG : Ea(meV)     NC/FLG : Ea(meV)   NT/FLG : Ea(meV)
+    109.99752047        126.70667641        101.63452644        128.58865352 
