@@ -1,5 +1,7 @@
 # Project_Nanocar
 Nanocar and Nanotruck dynamics by LAMMPS 
+ 
+Mofidi, S. M.; Nejat Pishkenari, H.; Ejtehadi, M. R.; Akimov, A. V. Locomotion of the C60-Based Nanomachines on Graphene Surfaces. Scientific Reports 2021, 11 (1), 2576. https://doi.org/10.1038/s41598-021-82280-7.
 
 This project studies the surface motion of nanomachines on graphene substrates.
 We do this by comparing the results of all-atomic molecular dynamics in a variety of atomistic models.
